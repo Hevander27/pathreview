@@ -24,6 +24,7 @@ async def _call_health_check(db: AsyncMock) -> Any:
         return exc.detail
 
 
+@pytest.mark.unit
 @pytest.mark.asyncio
 async def test_postgres_probe_uses_sqlalchemy_text_clause() -> None:
     """
@@ -45,6 +46,7 @@ async def test_postgres_probe_uses_sqlalchemy_text_clause() -> None:
     assert str(statement) == "SELECT 1"
 
 
+@pytest.mark.unit
 @pytest.mark.asyncio
 async def test_postgres_reported_healthy_when_query_succeeds() -> None:
     """A working database connection should be reported as healthy."""
@@ -55,6 +57,7 @@ async def test_postgres_reported_healthy_when_query_succeeds() -> None:
     assert payload["dependencies"]["postgres"] == "healthy"
 
 
+@pytest.mark.unit
 @pytest.mark.asyncio
 async def test_postgres_reported_unhealthy_when_query_fails() -> None:
     """
