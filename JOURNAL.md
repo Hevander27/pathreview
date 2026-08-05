@@ -127,7 +127,7 @@ for the Redis probe.
 
 ### Check-in 2 (end of week)
 
-**PR link:** _[PASTE PR URL HERE once the PR is opened]_
+**PR link:** https://github.com/ascherj/pathreview/pull/265
 
 **Branch:** `fix/154-health-check-raw-sql`
 
@@ -158,4 +158,4 @@ real outage). All marked `@pytest.mark.unit`.
 >
 > My new test file is itself ruff- and mypy-clean.
 
-**Draft PR feedback received from:** _[Slack handle, or "none"]_
+**Draft PR feedback received from:** none
