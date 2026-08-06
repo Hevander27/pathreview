@@ -159,3 +159,74 @@ real outage). All marked `@pytest.mark.unit`.
 > My new test file is itself ruff- and mypy-clean.
 
 **Draft PR feedback received from:** none
+
+## Week 10 — Iteration & reflection
+
+### Reviewer feedback
+
+**Feedback received:** [ ] Yes  [x] No — still awaiting review
+
+**Summary of feedback:**
+No reviewer feedback came in. Reviewer feedback is not provided in the Summer 2026
+cohort, and no maintainer or peer comments were left on PR #265 by the end of the
+module.
+
+**How you responded:**
+N/A — no feedback to respond to. The PR remains open and ready for review.
+
+---
+
+### Reflection
+
+**What was harder than you expected?**
+The *fix itself was two lines* — the hard part was everything around it. Getting
+the project running locally took the most effort of the whole module: the
+`docker compose` plugin was a broken symlink pointing at an uninstalled OrbStack,
+the colima daemon was stopped, the Chroma container crash-looped on a NumPy 2.0
+incompatibility, and `make setup` would have rebuilt my working Python 3.11 venv
+with the system's 3.9 because bare `python` doesn't exist on my machine. None of
+that was "the issue," but all of it stood between me and reproducing the issue. It
+drove home that on a real codebase, environment and tooling problems are often a
+bigger time sink than the actual bug.
+
+**What did you learn about working in a large codebase?**
+That "passing" doesn't mean "green." `make check` and `make test-unit` already
+failed on `main` — 182 ruff errors, 559 mypy errors, 53 failing unit tests — so
+the bar wasn't "make everything pass," it was "don't make anything *worse*." I
+learned to establish a baseline first and compare counts with and without my
+change, and to document pre-existing failures in the PR rather than trying to fix
+the whole repo. I also learned how much small conventions matter: `make test-unit`
+filters on `-m unit`, so my new tests were silently *deselected* until I added
+`@pytest.mark.unit` — they looked like they passed while never running. And I
+learned to scope ruthlessly: `/health` was failing for *two* independent reasons
+(the SQL bug and a separate missing `redis_host` setting), and the discipline was
+fixing only the one my issue named, not the endpoint as a whole.
+
+**How did AI tools help — and where did they fall short?**
+AI was most useful for orientation and diagnosis: locating the probe in
+`api/routes/health.py`, explaining that the broad `try/except` was catching a
+*programming* error and misreporting it as an outage, and rapidly working through
+the environment breakages. Where it fell short was anything that depended on the
+actual state of *this* repo at *this* moment. It couldn't tell me the pre-existing
+failure baseline, or that `make test-unit` would deselect my unmarked tests — those
+only came from running the real commands and reading the output. An AI summary also
+initially implied `WatchlistEntry`-style relationships existed where they didn't in
+a related project; the lesson that stuck was to trust the code and the command
+output over any summary of them.
+
+**What would you do differently if you started over?**
+Run `make check` and `make test-unit` to record the baseline *before* writing a
+single line, instead of discovering the pre-existing failures reactively when a
+commit hook blocked me. I'd also add the `@pytest.mark.unit` marker from the start
+(matching the existing test files) rather than finding out at the end that my tests
+weren't being run by the graded command. And I'd decide the "does JOURNAL.md belong
+in the upstream PR" question up front instead of leaving it open across three weeks.
+
+**What are you most proud of?**
+The restraint. Faced with a health endpoint returning 503 and a repo with hundreds
+of lint/type errors, it would have been easy to sprawl. Instead I kept the
+production change to exactly the two lines the issue called for, wrote a regression
+test that *fails without the fix* to prove it actually pins the bug, and documented
+the separate Redis issue and the pre-existing debt rather than absorbing them into
+my PR. A small, verifiable, well-scoped change is a more professional contribution
+than a big one.
